@@ -20,6 +20,10 @@ export default function SignInPage() {
     setIsLoading(true);
 
     try {
+      // Clear any existing invalid tokens before setting new ones
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('current_user_id');
+
       await authUtils.loginUser(email, password);
 
       toast.success('Welcome back!');

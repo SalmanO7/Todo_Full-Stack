@@ -16,14 +16,41 @@ class ApiClient {
     this.baseUrl = API_BASE_URL;
   }
 
+  private extractUserIdFromToken(token: string): string | null {
+    try {
+      // Split the JWT token and decode the payload
+      const tokenParts = token.split('.');
+      if (tokenParts.length === 3) {
+        // Add padding if needed
+        let payload = tokenParts[1];
+        while (payload.length % 4) {
+          payload += '=';
+        }
+
+        const decodedPayload = atob(payload);
+        const payloadObj = JSON.parse(decodedPayload);
+
+        // Return the user ID from the 'sub' claim or 'userId' field
+        return payloadObj.userId || payloadObj.sub || null;
+      }
+    } catch (error) {
+      console.error('Error extracting user ID from token:', error);
+    }
+
+    return null;
+  }
+
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
     const url = `${this.baseUrl}${endpoint}`;
 
-    // Get token from localStorage (from our auth client)
-    const token = localStorage.getItem('auth_token');
+    // Get Better Auth token from localStorage
+    const betterAuthToken = localStorage.getItem('better-auth.session_token');
+
+    // Also check for legacy auth token for backward compatibility
+    const legacyToken = localStorage.getItem('auth_token');
 
     // Only add Authorization header if we have a token
     const headers: any = {
@@ -31,14 +58,20 @@ class ApiClient {
       ...options.headers,
     };
 
-    // For development, we'll send the mock user ID header for all requests
-    // This allows the backend to bypass authentication in development mode
-    headers['X-Mock-User-ID'] = localStorage.getItem('current_user_id') || 'dev-user-id';
+    // Use Better Auth token if available, otherwise fall back to legacy token
+    const token = betterAuthToken || legacyToken;
 
-    // Still send the token in case we want to test real authentication
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }
+
+    // For development, we'll send the mock user ID header for all requests
+    // This allows the backend to bypass authentication in development mode
+    const currentUserId = localStorage.getItem('current_user_id') ||
+                          (betterAuthToken ? this.extractUserIdFromToken(betterAuthToken) : null) ||
+                          'dev-user-id';
+
+    headers['X-Mock-User-ID'] = currentUserId;
 
     try {
       const response = await fetch(url, {

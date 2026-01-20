@@ -97,9 +97,19 @@ export const useDeleteTask = () => {
       return apiClient.deleteTask(userId, taskId).then(res => res.data);
     },
     onSuccess: (_, variables) => {
-      // Remove the task from the cache and invalidate the tasks list
+      // Remove the specific task from the cache
       queryClient.removeQueries({ queryKey: QUERY_KEYS.task(variables.userId, variables.taskId) });
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.tasks(variables.userId) });
+
+      // Invalidate all tasks queries for this user regardless of status and sort parameters
+      // This ensures that any cached version of the user's tasks is refreshed
+      queryClient.invalidateQueries({
+        predicate: (query) => {
+          const queryKey = query.queryKey;
+          return Array.isArray(queryKey) &&
+                 queryKey[0] === 'tasks' &&
+                 queryKey[1] === variables.userId;
+        }
+      });
     },
   });
 };

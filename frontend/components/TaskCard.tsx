@@ -55,6 +55,10 @@ export function TaskCard({ task, onEdit, refetchTasks }: TaskCardProps) {
     try {
       await deleteTask.mutateAsync({ userId, taskId: task.id });
       toast.success('Task deleted successfully');
+      // Call refetchTasks to ensure the UI updates immediately
+      // This forces the parent component to refetch tasks and update the UI
+      // This is needed because sometimes the cache invalidation doesn't update the UI immediately
+      refetchTasks();
     } catch (error) {
       toast.error('Failed to delete task');
       console.error('Delete task error:', error);
@@ -94,24 +98,34 @@ export function TaskCard({ task, onEdit, refetchTasks }: TaskCardProps) {
         <div className="flex items-center text-xs text-muted-foreground">
           <CalendarIcon className="mr-1 h-3 w-3" />
           <span>
-            {task.updatedAt ?
-              (() => {
-                try {
-                  const date = new Date(task.updatedAt);
-                  if (isNaN(date.getTime())) {
-                    // If date is invalid, try to format the raw string if it exists
-                    return task.updatedAt.substring(0, 10); // Show just the date part
-                  }
-                  return date.toLocaleDateString(undefined, {
-                    month: 'short',
-                    day: 'numeric',
-                  });
-                } catch (error) {
-                  // If parsing fails, return the raw date string
-                  return task.updatedAt.substring(0, 10);
+            {(() => {
+              // Try createdAt first (primary), then updatedAt (secondary), then show 'Date unknown'
+              const dateStr = task.createdAt || task.updatedAt;
+
+              if (!dateStr) {
+                return 'Date unknown';
+              }
+
+              try {
+                // Parse the date string - should be in ISO format from the backend
+                const date = new Date(dateStr);
+
+                // Check if the date is valid
+                if (isNaN(date.getTime())) {
+                  // If the date is invalid, return the raw date string (first 10 chars for date only)
+                  return dateStr.substring(0, 10);
                 }
-              })()
-              : 'Date unknown'}
+
+                // Format the date nicely - use short month and numeric day
+                return date.toLocaleDateString(undefined, {
+                  month: 'short',
+                  day: 'numeric',
+                });
+              } catch (error) {
+                // If parsing fails for any reason, return the raw date string (first 10 chars)
+                return dateStr.substring(0, 10);
+              }
+            })()}
           </span>
         </div>
         <div className="flex gap-1">

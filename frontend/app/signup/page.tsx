@@ -34,6 +34,10 @@ export default function SignUpPage() {
     setIsLoading(true);
 
     try {
+      // Clear any existing invalid tokens before setting new ones
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('current_user_id');
+
       // Using authUtils.registerUser to handle registration
       await authUtils.registerUser(name, email, password);
 

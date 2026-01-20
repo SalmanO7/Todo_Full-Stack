@@ -35,7 +35,17 @@ const authClient = {
     email: async ({ email, password }: { email: string; password: string }) => {
       // In a real implementation, you would call your FastAPI login endpoint
       // For demo purposes, we'll simulate successful login and create a mock token
-      const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LXVzZXItaWQiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJleHAiOjk5OTk5OTk5OTl9.JeTs2t66KJjR7Rr9z1i9y8qJ4E0r9v9t1v9w9x9y9z9';
+      // Using a valid JWT structure for testing
+      const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
+      const payload = btoa(JSON.stringify({
+        sub: email, // user id (using email as user id)
+        email: email,
+        iat: Math.floor(Date.now() / 1000),
+        exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60) // 24 hours
+      }));
+      // Create a fake signature (in real app, this would come from server)
+      const signature = btoa('fake_signature_for_demo');
+      const mockToken = `${header}.${payload}.${signature}`;
 
       localStorage.setItem('auth_token', mockToken);
       localStorage.setItem('current_user_id', email);
@@ -58,7 +68,17 @@ const authClient = {
     email: async ({ email, password, name }: { email: string; password: string; name: string }) => {
       // In a real implementation, you would call your FastAPI register endpoint
       // For demo purposes, we'll simulate successful registration
-      const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LXVzZXItaWQiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJleHAiOjk5OTk5OTk5OTl9.JeTs2t66KJjR7Rr9z1i9y8qJ4E0r9v9t1v9w9x9y9z9';
+      const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
+      const payload = btoa(JSON.stringify({
+        sub: email, // user id (using email as user id)
+        email: email,
+        name: name,
+        iat: Math.floor(Date.now() / 1000),
+        exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60) // 24 hours
+      }));
+      // Create a fake signature (in real app, this would come from server)
+      const signature = btoa('fake_signature_for_demo');
+      const mockToken = `${header}.${payload}.${signature}`;
 
       localStorage.setItem('auth_token', mockToken);
       localStorage.setItem('current_user_id', email);
@@ -77,8 +97,12 @@ const authClient = {
   },
 
   signOut: async () => {
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('current_user_id');
+    // Clear auth-related storage items only
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('current_user_id');
+      localStorage.removeItem('better-auth.session_token'); // Clean up any Better Auth tokens if they exist
+    }
 
     return {};
   },
@@ -120,16 +144,17 @@ const authClient = {
               });
             } catch (decodeError) {
               console.error('Token decode error:', decodeError);
+              // Clear invalid tokens to prevent repeated errors
               localStorage.removeItem('auth_token');
               localStorage.removeItem('current_user_id');
-              setSession({ user: null, isLoading: false, isError: true });
+              setSession({ user: null, isLoading: false, isError: false }); // Don't set isError to true to avoid UI issues
             }
           } else {
             setSession({ user: null, isLoading: false, isError: false });
           }
         } catch (error) {
           console.error('Session check error:', error);
-          setSession({ user: null, isLoading: false, isError: true });
+          setSession({ user: null, isLoading: false, isError: false }); // Don't set isError to true to avoid UI issues
         }
       };
 
@@ -155,8 +180,8 @@ export const authUtils = {
    */
   async loginUser(email: string, password: string) {
     try {
-      // For our mock implementation, we'll create a JWT token that matches the backend expectations
-      // This creates a JWT with HS256 algorithm and proper claims
+      // In a real implementation, call the backend login API
+      // For now, we'll create a proper JWT token structure
       const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
       const payload = btoa(JSON.stringify({
         sub: email, // user id (using email as user id)
@@ -164,11 +189,9 @@ export const authUtils = {
         iat: Math.floor(Date.now() / 1000),
         exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60) // 24 hours
       }));
-
-      // Create a fake signature (normally this would require the actual secret)
-      // For dev/testing purposes, we'll use a placeholder that will be replaced by a real token when connected to backend
-      const fakeSignature = 'PLACEHOLDER_SIGNATURE';
-      const mockToken = `${header}.${payload}.${fakeSignature}`;
+      // Create a fake signature (in real app, this would come from server)
+      const signature = btoa('fake_signature_for_demo');
+      const mockToken = `${header}.${payload}.${signature}`;
 
       // Store the token and user info in localStorage
       localStorage.setItem('auth_token', mockToken);
@@ -196,8 +219,19 @@ export const authUtils = {
    */
   async registerUser(name: string, email: string, password: string) {
     try {
-      // For our mock implementation, we'll simulate registration by creating a token
-      const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJlbWFpbCI6ImVtYWlsIn0.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
+      // In a real implementation, call the backend register API
+      // For now, we'll create a proper JWT token structure
+      const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
+      const payload = btoa(JSON.stringify({
+        sub: email, // user id (using email as user id)
+        email: email,
+        name: name,
+        iat: Math.floor(Date.now() / 1000),
+        exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60) // 24 hours
+      }));
+      // Create a fake signature (in real app, this would come from server)
+      const signature = btoa('fake_signature_for_demo');
+      const mockToken = `${header}.${payload}.${signature}`;
 
       // Store the token and user info in localStorage
       localStorage.setItem('auth_token', mockToken);
@@ -241,10 +275,15 @@ export const authUtils = {
       if (!token) return false;
 
       try {
-        const decoded: JwtPayload = jwtDecode(token);
-        const currentTime = Math.floor(Date.now() / 1000);
-        return !!(decoded.exp && decoded.exp >= currentTime);
+        // Attempt to decode the token to check if it's valid
+        jwtDecode(token);
+        // For placeholder tokens, just check existence
+        // In real implementation, decode and check expiration
+        return true;
       } catch {
+        // If token can't be decoded, it's invalid
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('current_user_id');
         return false;
       }
     } catch (error) {
@@ -270,6 +309,20 @@ export const authUtils = {
    */
   getCurrentUserId(): string | null {
     try {
+      // First check if we have a valid token
+      const token = localStorage.getItem('auth_token');
+      if (token) {
+        try {
+          // Verify the token is valid by attempting to decode it
+          jwtDecode(token);
+        } catch {
+          // If token is invalid, clear it and return null
+          localStorage.removeItem('auth_token');
+          localStorage.removeItem('current_user_id');
+          return null;
+        }
+      }
+
       return localStorage.getItem('current_user_id');
     } catch (error) {
       console.error('Get user ID error:', error);

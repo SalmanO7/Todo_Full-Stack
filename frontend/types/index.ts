@@ -7,7 +7,7 @@ export interface User {
 }
 
 export interface Task {
-  id: string;
+  id: number; // Backend uses integer IDs
   userId: string;
   title: string;
   description?: string;

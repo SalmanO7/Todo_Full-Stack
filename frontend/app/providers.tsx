@@ -3,7 +3,8 @@
 import { ThemeProvider } from 'next-themes';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { clearInvalidTokens } from '@/lib/clearInvalidTokens';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   // Create QueryClient inside the component to avoid server-side creation
@@ -15,6 +16,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
       },
     },
   }));
+
+  // Clear any invalid tokens on component mount
+  useEffect(() => {
+    clearInvalidTokens();
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>

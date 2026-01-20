@@ -20,7 +20,8 @@ export default function TasksPageContent() {
   const session = useSession(); // This returns { user, isLoading, isError }
 
   useEffect(() => {
-    if (session.user && session.user.user_id) {
+    if (session.user) {
+      // Use the user ID from the session
       setUserId(session.user.user_id);
     } else if (!session.isLoading) {
       // If session is loaded but no user, try to get from auth utils

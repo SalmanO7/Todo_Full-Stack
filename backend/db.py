@@ -1,14 +1,15 @@
-from sqlmodel import Session
+from sqlmodel import Session, SQLModel
 from sqlalchemy import create_engine
 import os
 from typing import Generator
+from models import User, Task   # IMPORTANT
 
-# Database URL from environment - using asyncpg driver
-# For local testing, you can use a SQLite database instead
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./todo_app.db")
 
-# Create engine - using asyncpg driver for PostgreSQL or SQLite for local testing
-engine = create_engine(DATABASE_URL, echo=False)
+engine = create_engine(DATABASE_URL, echo=True)
+
+def init_db():
+    SQLModel.metadata.create_all(engine)
 
 def get_session() -> Generator[Session, None, None]:
     with Session(engine) as session:

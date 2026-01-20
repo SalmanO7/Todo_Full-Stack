@@ -40,7 +40,8 @@ def get_tasks(
     # Default is already by created date (desc)
 
     tasks = session.exec(query).all()
-    return tasks
+    # Convert each task to the response model
+    return [TaskResponse.from_orm(task) for task in tasks]
 
 
 @router.post("/tasks", response_model=TaskResponse, status_code=status.HTTP_201_CREATED)
@@ -77,7 +78,8 @@ def create_task(
     session.add(task)
     session.commit()
     session.refresh(task)
-    return task
+    # Convert to response model
+    return TaskResponse.from_orm(task)
 
 
 @router.get("/tasks/{id}", response_model=TaskResponse)
@@ -104,7 +106,8 @@ def get_task(
             detail="Access denied: Insufficient permissions"
         )
 
-    return task
+    # Convert to response model
+    return TaskResponse.from_orm(task)
 
 
 @router.put("/tasks/{id}", response_model=TaskResponse)
@@ -158,7 +161,8 @@ def update_task(
     session.add(task)
     session.commit()
     session.refresh(task)
-    return task
+    # Convert to response model
+    return TaskResponse.from_orm(task)
 
 
 @router.delete("/tasks/{id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -221,4 +225,5 @@ def toggle_task_completion(
     session.add(task)
     session.commit()
     session.refresh(task)
-    return task
+    # Convert to response model
+    return TaskResponse.from_orm(task)
