@@ -63,18 +63,19 @@ export const useUpdateTask = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ userId, taskId, taskData }: { userId: string; taskId: string; taskData: UpdateTaskRequest }) => {
+    mutationFn: ({ userId, taskId, taskData }: { userId: string; taskId: string | number; taskData: UpdateTaskRequest }) => {
       if (!userId || userId === 'undefined') {
         throw new Error('User ID is required and cannot be undefined');
       }
-      if (!taskId || taskId === 'undefined') {
+      if (!taskId || taskId === 'undefined' || taskId === '') {
         throw new Error('Task ID is required and cannot be undefined');
       }
-      return apiClient.updateTask(userId, taskId, taskData).then(res => res.data);
+      // Ensure taskId is a string when passed to API client
+      return apiClient.updateTask(userId, taskId.toString(), taskData).then(res => res.data);
     },
-    onSuccess: (_, variables) => {
-      // Update the specific task query and invalidate the tasks list
-      queryClient.setQueryData(QUERY_KEYS.task(variables.userId, variables.taskId), variables.taskData);
+    onSuccess: (updatedTask, variables) => {
+      // Update the specific task query with the actual updated task data and invalidate the tasks list
+      queryClient.setQueryData(QUERY_KEYS.task(variables.userId, variables.taskId.toString()), updatedTask);
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.tasks(variables.userId) });
 
       // Also invalidate all task queries for this user to ensure freshness
@@ -87,18 +88,19 @@ export const useDeleteTask = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ userId, taskId }: { userId: string; taskId: string }) => {
+    mutationFn: ({ userId, taskId }: { userId: string; taskId: string | number }) => {
       if (!userId || userId === 'undefined') {
         throw new Error('User ID is required and cannot be undefined');
       }
-      if (!taskId || taskId === 'undefined') {
+      if (!taskId || taskId === 'undefined' || taskId === '') {
         throw new Error('Task ID is required and cannot be undefined');
       }
-      return apiClient.deleteTask(userId, taskId).then(res => res.data);
+      // Ensure taskId is a string when passed to API client
+      return apiClient.deleteTask(userId, taskId.toString()).then(res => res.data);
     },
     onSuccess: (_, variables) => {
       // Remove the specific task from the cache
-      queryClient.removeQueries({ queryKey: QUERY_KEYS.task(variables.userId, variables.taskId) });
+      queryClient.removeQueries({ queryKey: QUERY_KEYS.task(variables.userId, variables.taskId.toString()) });
 
       // Invalidate all tasks queries for this user regardless of status and sort parameters
       // This ensures that any cached version of the user's tasks is refreshed
@@ -118,32 +120,33 @@ export const useToggleTaskCompletion = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ userId, taskId }: { userId: string; taskId: string }) => {
+    mutationFn: ({ userId, taskId }: { userId: string; taskId: string | number }) => {
       if (!userId || userId === 'undefined') {
         throw new Error('User ID is required and cannot be undefined');
       }
-      if (!taskId || taskId === 'undefined') {
+      if (!taskId || taskId === 'undefined' || taskId === '') {
         throw new Error('Task ID is required and cannot be undefined');
       }
-      return apiClient.toggleTaskCompletion(userId, taskId).then(res => res.data);
+      // Ensure taskId is a string when passed to API client
+      return apiClient.toggleTaskCompletion(userId, taskId.toString()).then(res => res.data);
     },
     onMutate: async ({ userId, taskId }) => {
       if (!userId || userId === 'undefined') {
         throw new Error('User ID is required and cannot be undefined');
       }
-      if (!taskId || taskId === 'undefined') {
+      if (!taskId || taskId === 'undefined' || taskId === '') {
         throw new Error('Task ID is required and cannot be undefined');
       }
 
       // Cancel outgoing refetches to avoid overwriting optimistic update
-      await queryClient.cancelQueries({ queryKey: QUERY_KEYS.task(userId, taskId) });
+      await queryClient.cancelQueries({ queryKey: QUERY_KEYS.task(userId, taskId.toString()) });
 
       // Snapshot the previous value
-      const previousTask = queryClient.getQueryData<Task>(QUERY_KEYS.task(userId, taskId));
+      const previousTask = queryClient.getQueryData<Task>(QUERY_KEYS.task(userId, taskId.toString()));
 
       // Optimistically update the cache
       if (previousTask) {
-        queryClient.setQueryData<Task>(QUERY_KEYS.task(userId, taskId), {
+        queryClient.setQueryData<Task>(QUERY_KEYS.task(userId, taskId.toString()), {
           ...previousTask,
           completed: !previousTask.completed,
         });
@@ -155,7 +158,7 @@ export const useToggleTaskCompletion = () => {
       if (previousTasks) {
         queryClient.setQueryData<Task[]>(tasksQueryKey,
           previousTasks.map(task =>
-            task.id === taskId ? { ...task, completed: !task.completed } : task
+            task.id === parseInt(taskId.toString()) ? { ...task, completed: !task.completed } : task
           )
         );
       }
@@ -165,12 +168,12 @@ export const useToggleTaskCompletion = () => {
     onError: (err, variables, context) => {
       // Rollback the optimistic update if mutation fails
       if (context?.previousTask) {
-        queryClient.setQueryData(QUERY_KEYS.task(variables.userId, variables.taskId), context.previousTask);
+        queryClient.setQueryData(QUERY_KEYS.task(variables.userId, variables.taskId.toString()), context.previousTask);
       }
     },
     onSuccess: (updatedTask, variables) => {
       // Update the specific task query with the actual server response
-      queryClient.setQueryData(QUERY_KEYS.task(variables.userId, variables.taskId), updatedTask);
+      queryClient.setQueryData(QUERY_KEYS.task(variables.userId, variables.taskId.toString()), updatedTask);
 
       // Update the tasks list with the actual server response
       const tasksQueryKey = QUERY_KEYS.tasks(variables.userId);
@@ -178,7 +181,7 @@ export const useToggleTaskCompletion = () => {
       if (currentTasks) {
         queryClient.setQueryData<Task[]>(tasksQueryKey,
           currentTasks.map(task =>
-            task.id === variables.taskId ? updatedTask : task
+            task.id === parseInt(variables.taskId.toString()) ? updatedTask : task
           )
         );
       }

@@ -28,7 +28,7 @@ export function TaskCard({ task, onEdit, refetchTasks }: TaskCardProps) {
     }
 
     toggleCompletion.mutate(
-      { userId, taskId: task.id },
+      { userId, taskId: task.id.toString() }, // Convert number ID to string
       {
         onError: (error) => {
           toast.error('Failed to update task completion status');
@@ -53,7 +53,7 @@ export function TaskCard({ task, onEdit, refetchTasks }: TaskCardProps) {
 
     setIsDeleting(true);
     try {
-      await deleteTask.mutateAsync({ userId, taskId: task.id });
+      await deleteTask.mutateAsync({ userId, taskId: task.id.toString() }); // Convert number ID to string
       toast.success('Task deleted successfully');
       // Call refetchTasks to ensure the UI updates immediately
       // This forces the parent component to refetch tasks and update the UI

@@ -64,7 +64,7 @@ export function TaskModal({ isOpen, onClose, task, userId }: TaskModalProps) {
         // Update existing task
         await updateTask.mutateAsync({
           userId,
-          taskId: task.id,
+          taskId: task.id.toString(), // Convert number ID to string
           taskData: {
             title: data.title,
             description: data.description,
