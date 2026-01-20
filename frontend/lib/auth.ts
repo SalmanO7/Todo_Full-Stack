@@ -101,8 +101,7 @@ const authClient = {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('auth_token');
       localStorage.removeItem('current_user_id');
-      localStorage.removeItem('better-auth.session_token'); // Clean up any Better Auth tokens if they exist
-
+      localStorage.removeItem('better-auth.session_token');
       // Trigger a storage event to notify other tabs/components of the change
       window.dispatchEvent(new StorageEvent('storage', {
         key: 'auth_token',
@@ -110,7 +109,7 @@ const authClient = {
         newValue: null,
       }));
     }
-
+    
     return {};
   },
 

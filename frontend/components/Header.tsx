@@ -23,9 +23,9 @@ export default function Header() {
     try {
       await authUtils.logoutUser();
 
-      // Force a refresh of the page to ensure all state is cleared
-      // This ensures that the UI updates properly after logout
-      window.location.reload();
+      // Redirect to sign-in page after logout instead of refreshing
+      // This ensures that the user cannot access protected routes like /tasks
+      window.location.href = '/signin';
     } catch (error) {
       console.error('Logout error:', error);
     }

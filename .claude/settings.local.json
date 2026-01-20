@@ -158,7 +158,9 @@
       "Bash(python -c \"from init_db import create_tables; create_tables\\(\\)\")",
       "Bash(dir \"C:\\\\Users\\\\HZTech\\\\desktop\\\\Todo-App\\\\backend\\\\*.py\")",
       "Bash(cmd /c \"dir \"\"C:\\\\Users\\\\HZTech\\\\desktop\\\\Todo-App\\\\backend\\\\*.py\"\"\")",
-      "Bash(dir \"C:\\\\Users\\\\HZTech\\\\desktop\\\\Todo-App\\\\backend\" /s)"
+      "Bash(dir \"C:\\\\Users\\\\HZTech\\\\desktop\\\\Todo-App\\\\backend\" /s)",
+      "Bash(powershell Get-Content \"C:\\\\Users\\\\HZTech\\\\desktop\\\\Todo-App\\\\frontend\\\\app\\\\tasks\\\\TasksPageContent.tsx\")",
+      "Bash(Measure-Object -Line)"
     ]
   }
 }
