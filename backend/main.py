@@ -51,7 +51,7 @@ init_database()
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8005, reload=True)  # Changed to port 8005 to match frontend config
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)  # Changed to port 8005 to match frontend config
 
 
 
