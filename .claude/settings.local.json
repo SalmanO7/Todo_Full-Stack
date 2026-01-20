@@ -155,7 +155,10 @@
       "Bash(powershell Remove-Item -Path \"C:\\\\Users\\\\HZTech\\\\desktop\\\\Todo-App\\\\nul\" -Force)",
       "Bash(dir \"C:\\\\Users\\\\HZTech\\\\desktop\\\\Todo-App\" /a)",
       "Bash(ls -la \"C:\\\\Users\\\\HZTech\\\\desktop\\\\Todo-App\\\\tmpclaude-\"*)",
-      "Bash(python -c \"from init_db import create_tables; create_tables\\(\\)\")"
+      "Bash(python -c \"from init_db import create_tables; create_tables\\(\\)\")",
+      "Bash(dir \"C:\\\\Users\\\\HZTech\\\\desktop\\\\Todo-App\\\\backend\\\\*.py\")",
+      "Bash(cmd /c \"dir \"\"C:\\\\Users\\\\HZTech\\\\desktop\\\\Todo-App\\\\backend\\\\*.py\"\"\")",
+      "Bash(dir \"C:\\\\Users\\\\HZTech\\\\desktop\\\\Todo-App\\\\backend\" /s)"
     ]
   }
 }
