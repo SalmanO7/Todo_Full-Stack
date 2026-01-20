@@ -102,6 +102,13 @@ const authClient = {
       localStorage.removeItem('auth_token');
       localStorage.removeItem('current_user_id');
       localStorage.removeItem('better-auth.session_token'); // Clean up any Better Auth tokens if they exist
+
+      // Trigger a storage event to notify other tabs/components of the change
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: 'auth_token',
+        oldValue: localStorage.getItem('auth_token'),
+        newValue: null,
+      }));
     }
 
     return {};
@@ -197,6 +204,15 @@ export const authUtils = {
       localStorage.setItem('auth_token', mockToken);
       localStorage.setItem('current_user_id', email);
 
+      // Trigger a storage event to notify other tabs/components of the change
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new StorageEvent('storage', {
+          key: 'auth_token',
+          oldValue: null,
+          newValue: mockToken,
+        }));
+      }
+
       // Return a simulated response that matches the expected format
       return {
         user: {
@@ -236,6 +252,15 @@ export const authUtils = {
       // Store the token and user info in localStorage
       localStorage.setItem('auth_token', mockToken);
       localStorage.setItem('current_user_id', email);
+
+      // Trigger a storage event to notify other tabs/components of the change
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new StorageEvent('storage', {
+          key: 'auth_token',
+          oldValue: null,
+          newValue: mockToken,
+        }));
+      }
 
       // Return a simulated response that matches the expected format
       return {

@@ -22,8 +22,10 @@ export default function Header() {
   const handleLogout = async () => {
     try {
       await authUtils.logoutUser();
-      // Refresh the page to update UI after logout
-      window.location.href = '/';
+
+      // Force a refresh of the page to ensure all state is cleared
+      // This ensures that the UI updates properly after logout
+      window.location.reload();
     } catch (error) {
       console.error('Logout error:', error);
     }

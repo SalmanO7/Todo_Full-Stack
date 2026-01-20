@@ -27,10 +27,16 @@ export default function SignInPage() {
       await authUtils.loginUser(email, password);
 
       toast.success('Welcome back!');
-      // Wait a moment for the auth state to update, then redirect to tasks
-      setTimeout(() => {
-        router.push('/tasks');
-      }, 500); // Shorter delay for login
+
+      // Dispatch a storage event to notify other components of auth change
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: 'auth_token',
+        oldValue: null,
+        newValue: localStorage.getItem('auth_token'),
+      }));
+
+      // Redirect to tasks immediately after successful login
+      router.push('/tasks');
     } catch (error: any) {
       console.error('Sign in error:', error);
       toast.error(error?.message || 'An error occurred during sign in');

@@ -41,11 +41,16 @@ export default function SignUpPage() {
       // Using authUtils.registerUser to handle registration
       await authUtils.registerUser(name, email, password);
 
+      // Dispatch a storage event to notify other components of auth change
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: 'auth_token',
+        oldValue: null,
+        newValue: localStorage.getItem('auth_token'),
+      }));
+
       toast.success('Account created successfully! Redirecting to tasks...');
-      // Wait a moment for the auth state to update, then redirect to tasks
-      setTimeout(() => {
-        router.push('/tasks');
-      }, 1000);
+      // Redirect to tasks immediately after successful registration
+      router.push('/tasks');
     } catch (error: any) {
       console.error('Sign up error:', error);
       toast.error(error?.message || 'An error occurred during sign up');
