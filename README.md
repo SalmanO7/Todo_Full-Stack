@@ -16,7 +16,7 @@ A complete, beautiful, and responsive task management application built with Nex
 ## 🛠️ Tech Stack
 
 ### Frontend
-- **Framework**: Next.js 14+ with App Router
+- **Framework**: Next.js 16+ with App Router
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
 - **Authentication**: Better Auth
