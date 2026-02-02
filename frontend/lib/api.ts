@@ -46,11 +46,9 @@ class ApiClient {
   ): Promise<ApiResponse<T>> {
     const url = `${this.baseUrl}${endpoint}`;
 
-    // Get Better Auth token from localStorage
+    // Get Better Auth token - it should be available through the auth context
+    // but we'll also check localStorage as fallback
     const betterAuthToken = localStorage.getItem('better-auth.session_token');
-
-    // Also check for legacy auth token for backward compatibility
-    const legacyToken = localStorage.getItem('auth_token');
 
     // Only add Authorization header if we have a token
     const headers: any = {
@@ -58,14 +56,11 @@ class ApiClient {
       ...options.headers,
     };
 
-    // Use Better Auth token if available, otherwise fall back to legacy token
-    const token = betterAuthToken || legacyToken;
-
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
+    if (betterAuthToken) {
+      headers['Authorization'] = `Bearer ${betterAuthToken}`;
     }
 
-    // Extract user ID from the Better Auth token (for production) or fallback to stored ID
+    // Extract user ID from the Better Auth token for backend user isolation
     let currentUserId = 'dev-user-id';
 
     if (betterAuthToken) {
@@ -81,17 +76,15 @@ class ApiClient {
 
           const decodedPayload = atob(payload);
           const payloadObj = JSON.parse(decodedPayload);
-          currentUserId = payloadObj.userId || payloadObj.sub || localStorage.getItem('current_user_id') || 'dev-user-id';
+          currentUserId = payloadObj.userId || payloadObj.sub || payloadObj.user_id || 'dev-user-id';
         }
       } catch (error) {
         console.error('Error extracting user ID from Better Auth token:', error);
+        // If we can't extract from token, try to get from localStorage
         currentUserId = localStorage.getItem('current_user_id') || 'dev-user-id';
       }
-    } else if (legacyToken) {
-      // Extract user ID from legacy token
-      currentUserId = this.extractUserIdFromToken(legacyToken) || localStorage.getItem('current_user_id') || 'dev-user-id';
     } else {
-      // Fallback to stored user ID
+      // Fallback to stored user ID if no token is available
       currentUserId = localStorage.getItem('current_user_id') || 'dev-user-id';
     }
 

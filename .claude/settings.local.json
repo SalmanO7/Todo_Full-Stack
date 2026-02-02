@@ -163,7 +163,11 @@
       "Bash(Measure-Object -Line)",
       "Skill(sp.analyze)",
       "Bash(powershell -Command \".specify/scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks\")",
-      "Bash(dir /s)"
+      "Bash(dir /s)",
+      "Bash(dir backendroutes)",
+      "Bash(dir \"C:\\\\Users\\\\Salman Agwan\\\\desktop\\\\Todo-App\\\\backend\\\\routes\")",
+      "Bash(dir \"C:\\\\Users\\\\Salman Agwan\\\\desktop\\\\Todo-App\\\\frontend\\\\app\\\\signup\")",
+      "Bash(dir \"C:\\\\Users\\\\Salman Agwan\\\\desktop\\\\Todo-App\\\\frontend\\\\app\\\\signin\")"
     ]
   }
 }

@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
-import { authUtils } from '@/lib/auth';
+import { signIn } from 'better-auth/react';
 import { toast } from 'sonner';
 
 export default function SignUpPage() {
@@ -34,19 +34,19 @@ export default function SignUpPage() {
     setIsLoading(true);
 
     try {
-      // Clear any existing invalid tokens before setting new ones
-      localStorage.removeItem('auth_token');
-      localStorage.removeItem('current_user_id');
+      // Using Better Auth signIn with isSignUp flag to handle registration
+      const result = await signIn('email', {
+        email,
+        password,
+        name, // Include name for registration
+        isSignUp: true, // This tells Better Auth this is a sign-up request
+        redirectTo: '/tasks', // Redirect after successful registration
+      });
 
-      // Using authUtils.registerUser to handle registration
-      await authUtils.registerUser(name, email, password);
-
-      // Dispatch a storage event to notify other components of auth change
-      window.dispatchEvent(new StorageEvent('storage', {
-        key: 'auth_token',
-        oldValue: null,
-        newValue: localStorage.getItem('auth_token'),
-      }));
+      if (result?.error) {
+        toast.error(result.error.message || 'An error occurred during sign up');
+        return;
+      }
 
       toast.success('Account created successfully! Redirecting to tasks...');
       // Redirect to tasks immediately after successful registration

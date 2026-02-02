@@ -1,6 +1,6 @@
-// lib/auth.ts - Updated auth implementation for Better Auth integration
+// lib/auth.ts - Better Auth integration for frontend
 
-import { useState, useEffect } from 'react';
+import { useSession as useBetterAuthSession, signIn as betterAuthSignIn, signOut as betterAuthSignOut } from 'better-auth/react';
 import { jwtDecode } from 'jwt-decode';
 
 // Define types for our auth system
@@ -23,175 +23,8 @@ interface JwtPayload {
   iat?: number; // issued at time
 }
 
-// Better Auth API endpoints
-const BETTER_AUTH_BASE_URL = process.env.NEXT_PUBLIC_BETTER_AUTH_URL || 'https://salman907-backend-todo.hf.space';
-
-// Better Auth client implementation
-const authClient = {
-  signIn: {
-    email: async ({ email, password }: { email: string; password: string }) => {
-      // Call Better Auth login endpoint
-      const response = await fetch(`${BETTER_AUTH_BASE_URL}/api/auth/sign-in/email`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Login failed');
-      }
-
-      const result = await response.json();
-
-      // Store the session token from Better Auth
-      if (result.session?.token) {
-        localStorage.setItem('better-auth.session_token', result.session.token);
-
-        // Decode the token to get user info
-        try {
-          const decoded: JwtPayload = jwtDecode(result.session.token);
-          localStorage.setItem('current_user_id', decoded.sub);
-        } catch (error) {
-          console.error('Error decoding token:', error);
-        }
-      }
-
-      return result;
-    }
-  },
-
-  signUp: {
-    email: async ({ email, password, name }: { email: string; password: string; name: string }) => {
-      // Call Better Auth register endpoint
-      const response = await fetch(`${BETTER_AUTH_BASE_URL}/api/auth/sign-up/email`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password, name }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Registration failed');
-      }
-
-      const result = await response.json();
-
-      // Store the session token from Better Auth
-      if (result.session?.token) {
-        localStorage.setItem('better-auth.session_token', result.session.token);
-
-        // Decode the token to get user info
-        try {
-          const decoded: JwtPayload = jwtDecode(result.session.token);
-          localStorage.setItem('current_user_id', decoded.sub);
-        } catch (error) {
-          console.error('Error decoding token:', error);
-        }
-      }
-
-      return result;
-    }
-  },
-
-  signOut: async () => {
-    // Call Better Auth signout endpoint
-    const token = localStorage.getItem('better-auth.session_token');
-
-    if (token) {
-      await fetch(`${BETTER_AUTH_BASE_URL}/api/auth/sign-out`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-      }).catch(() => {}); // Ignore errors during signout
-    }
-
-    // Clear auth-related storage items
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('better-auth.session_token');
-      localStorage.removeItem('current_user_id');
-      localStorage.removeItem('auth_token'); // Remove legacy token
-
-      // Trigger a storage event to notify other tabs/components of the change
-      window.dispatchEvent(new StorageEvent('storage', {
-        key: 'better-auth.session_token',
-        oldValue: localStorage.getItem('better-auth.session_token'),
-        newValue: null,
-      }));
-    }
-
-    return {};
-  },
-
-  useSession: (): Session => {
-    const [session, setSession] = useState<Session>({
-      user: null,
-      isLoading: true,
-      isError: false
-    });
-
-    useEffect(() => {
-      const checkSession = () => {
-        try {
-          const token = localStorage.getItem('better-auth.session_token');
-
-          if (token) {
-            try {
-              const decoded: JwtPayload = jwtDecode(token);
-
-              // Check if token is expired
-              const currentTime = Math.floor(Date.now() / 1000);
-              if (decoded.exp && decoded.exp < currentTime) {
-                localStorage.removeItem('better-auth.session_token');
-                localStorage.removeItem('current_user_id');
-                setSession({ user: null, isLoading: false, isError: false });
-                return;
-              }
-
-              const userId = localStorage.getItem('current_user_id') || decoded.sub;
-
-              setSession({
-                user: {
-                  user_id: userId,
-                  email: decoded.email
-                },
-                isLoading: false,
-                isError: false
-              });
-            } catch (decodeError) {
-              console.error('Token decode error:', decodeError);
-              // Clear invalid tokens to prevent repeated errors
-              localStorage.removeItem('better-auth.session_token');
-              localStorage.removeItem('current_user_id');
-              setSession({ user: null, isLoading: false, isError: false }); // Don't set isError to true to avoid UI issues
-            }
-          } else {
-            setSession({ user: null, isLoading: false, isError: false });
-          }
-        } catch (error) {
-          console.error('Session check error:', error);
-          setSession({ user: null, isLoading: false, isError: false }); // Don't set isError to true to avoid UI issues
-        }
-      };
-
-      checkSession();
-
-      // Check session when storage changes
-      const handleStorageChange = () => checkSession();
-      window.addEventListener('storage', handleStorageChange);
-
-      return () => window.removeEventListener('storage', handleStorageChange);
-    }, []);
-
-    return session;
-  }
-};
+// Use Better Auth's session hook
+export { useBetterAuthSession as useSession };
 
 /**
  * Authentication utilities for Better Auth integration
@@ -202,33 +35,11 @@ export const authUtils = {
    */
   async loginUser(email: string, password: string) {
     try {
-      const response = await fetch(`${BETTER_AUTH_BASE_URL}/api/auth/sign-in/email`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
+      const result = await betterAuthSignIn('email', {
+        email,
+        password,
+        redirectTo: '/tasks', // Redirect after successful login
       });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Login failed');
-      }
-
-      const result = await response.json();
-
-      // Store the session token from Better Auth
-      if (result.session?.token) {
-        localStorage.setItem('better-auth.session_token', result.session.token);
-
-        // Decode the token to get user info
-        try {
-          const decoded: JwtPayload = jwtDecode(result.session.token);
-          localStorage.setItem('current_user_id', decoded.sub);
-        } catch (error) {
-          console.error('Error decoding token:', error);
-        }
-      }
 
       return result;
     } catch (error) {
@@ -242,33 +53,13 @@ export const authUtils = {
    */
   async registerUser(name: string, email: string, password: string) {
     try {
-      const response = await fetch(`${BETTER_AUTH_BASE_URL}/api/auth/sign-up/email`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password, name }),
+      const result = await betterAuthSignIn('email', {
+        email,
+        password,
+        name, // Include name for registration
+        isSignUp: true, // This tells Better Auth this is a sign-up request
+        redirectTo: '/tasks', // Redirect after successful registration
       });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Registration failed');
-      }
-
-      const result = await response.json();
-
-      // Store the session token from Better Auth
-      if (result.session?.token) {
-        localStorage.setItem('better-auth.session_token', result.session.token);
-
-        // Decode the token to get user info
-        try {
-          const decoded: JwtPayload = jwtDecode(result.session.token);
-          localStorage.setItem('current_user_id', decoded.sub);
-        } catch (error) {
-          console.error('Error decoding token:', error);
-        }
-      }
 
       return result;
     } catch (error) {
@@ -282,7 +73,7 @@ export const authUtils = {
    */
   async logoutUser() {
     try {
-      await authClient.signOut();
+      await betterAuthSignOut();
     } catch (error) {
       console.error('Logout error:', error);
       throw error;
@@ -371,6 +162,5 @@ export const authUtils = {
   },
 };
 
-// Export the auth hooks and methods
-export const { useSession } = authClient;
-export const { signIn, signOut, signUp } = authClient;
+// Export Better Auth functions directly
+export { betterAuthSignIn as signIn, betterAuthSignOut as signOut };

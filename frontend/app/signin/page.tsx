@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
-import { authUtils } from '@/lib/auth';
+import { signIn } from 'better-auth/react';
 import { toast } from 'sonner';
 
 export default function SignInPage() {
@@ -20,20 +20,19 @@ export default function SignInPage() {
     setIsLoading(true);
 
     try {
-      // Clear any existing invalid tokens before setting new ones
-      localStorage.removeItem('auth_token');
-      localStorage.removeItem('current_user_id');
+      // Using Better Auth signIn to handle login
+      const result = await signIn('email', {
+        email,
+        password,
+        redirectTo: '/tasks', // Redirect after successful login
+      });
 
-      await authUtils.loginUser(email, password);
+      if (result?.error) {
+        toast.error(result.error.message || 'An error occurred during sign in');
+        return;
+      }
 
       toast.success('Welcome back!');
-
-      // Dispatch a storage event to notify other components of auth change
-      window.dispatchEvent(new StorageEvent('storage', {
-        key: 'auth_token',
-        oldValue: null,
-        newValue: localStorage.getItem('auth_token'),
-      }));
 
       // Redirect to tasks immediately after successful login
       router.push('/tasks');
