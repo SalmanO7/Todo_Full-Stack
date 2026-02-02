@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routes import tasks
+from routes import auth
 import os
 from dotenv import load_dotenv
 
@@ -52,11 +53,10 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    # Allow credentials for authentication
-    allow_credentials=True,
 )
 
-# Include task routes
+# Include auth and task routes
+app.include_router(auth.router, tags=["auth"])
 app.include_router(tasks.router, prefix="/api/{user_id}", tags=["tasks"])
 
 @app.get("/")
@@ -90,5 +90,5 @@ def health_check():
 
 if __name__ == "__main__":
     import uvicorn
-    port = int(os.getenv("PORT", 8000))  # Hugging Face uses PORT environment variable
+    port = int(os.getenv("PORT", 7860))  # Hugging Face uses PORT environment variable
     uvicorn.run("main:app", host="0.0.0.0", port=port, reload=(os.getenv("ENVIRONMENT") == "development"))

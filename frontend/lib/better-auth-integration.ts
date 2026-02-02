@@ -28,8 +28,8 @@ interface JwtPayload {
   iat?: number; // issued at time
 }
 
-// Better Auth API endpoints
-const BETTER_AUTH_BASE_URL = process.env.NEXT_PUBLIC_BETTER_AUTH_URL || 'https://salman907-backend-todo.hf.space';
+// Better Auth API endpoints - use the same API base URL as the rest of the app
+const BETTER_AUTH_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_BETTER_AUTH_URL || 'http://localhost:8000';
 
 // Better Auth client implementation
 const betterAuthClient = {

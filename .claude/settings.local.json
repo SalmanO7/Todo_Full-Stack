@@ -170,7 +170,11 @@
       "Bash(dir \"C:\\\\Users\\\\Salman Agwan\\\\desktop\\\\Todo-App\\\\frontend\\\\app\\\\signin\")",
       "Bash(del \"C:\\\\Users\\\\Salman Agwan\\\\desktop\\\\Todo-App\\\\frontend\\\\lib\\\\better-auth-config.ts\")",
       "Bash(dir frontendlib*.ts)",
-      "Bash(dir \"C:\\\\Users\\\\Salman Agwan\\\\desktop\\\\Todo-App\\\\frontend\\\\lib\" /s)"
+      "Bash(dir \"C:\\\\Users\\\\Salman Agwan\\\\desktop\\\\Todo-App\\\\frontend\\\\lib\" /s)",
+      "Bash(dir \"C:\\\\Users\\\\Salman Agwan\\\\desktop\\\\Todo-App\\\\backend\" /s)",
+      "Bash(dir \"C:\\\\Users\\\\Salman Agwan\\\\desktop\\\\Todo-App\\\\backend\\\\routes\" /s)",
+      "Bash(python -m uvicorn main:app --reload)",
+      "Bash(python -m uvicorn main:app --host 0.0.0.0 --port 8000)"
     ]
   }
 }
