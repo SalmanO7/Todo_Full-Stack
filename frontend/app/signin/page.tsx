@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
-import { signIn } from 'better-auth/react';
+import { signIn } from '@/lib/auth';
 import { toast } from 'sonner';
 
 export default function SignInPage() {

@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
 import { useState, useEffect } from 'react';
 import { clearInvalidTokens } from '@/lib/clearInvalidTokens';
-import { ClientProvider } from 'better-auth/react';
+import { ClientProvider } from '@/lib/better-auth-client';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   // Create QueryClient inside the component to avoid server-side creation

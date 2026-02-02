@@ -1,12 +1,13 @@
 // lib/auth.ts - Better Auth integration for frontend
 
-import { useSession as useBetterAuthSession, signIn as betterAuthSignIn, signOut as betterAuthSignOut } from 'better-auth/react';
+import { useSession, signIn, signOut } from './better-auth-client';
 import { jwtDecode } from 'jwt-decode';
 
 // Define types for our auth system
 interface User {
-  user_id: string;
+  $id: string; // Better Auth uses $id for user ID
   email?: string;
+  name?: string;
 }
 
 interface Session {
@@ -19,12 +20,13 @@ interface Session {
 interface JwtPayload {
   sub: string; // subject (user id)
   email?: string;
+  name?: string;
   exp?: number; // expiration time
   iat?: number; // issued at time
 }
 
-// Use Better Auth's session hook
-export { useBetterAuthSession as useSession };
+// Export the session hook
+export { useSession };
 
 /**
  * Authentication utilities for Better Auth integration
@@ -35,7 +37,7 @@ export const authUtils = {
    */
   async loginUser(email: string, password: string) {
     try {
-      const result = await betterAuthSignIn('email', {
+      const result = await signIn('email', {
         email,
         password,
         redirectTo: '/tasks', // Redirect after successful login
@@ -53,7 +55,7 @@ export const authUtils = {
    */
   async registerUser(name: string, email: string, password: string) {
     try {
-      const result = await betterAuthSignIn('email', {
+      const result = await signIn('email', {
         email,
         password,
         name, // Include name for registration
@@ -73,7 +75,7 @@ export const authUtils = {
    */
   async logoutUser() {
     try {
-      await betterAuthSignOut();
+      await signOut();
     } catch (error) {
       console.error('Logout error:', error);
       throw error;
@@ -162,5 +164,5 @@ export const authUtils = {
   },
 };
 
-// Export Better Auth functions directly
-export { betterAuthSignIn as signIn, betterAuthSignOut as signOut };
+// Export the signIn and signOut functions
+export { signIn, signOut };
