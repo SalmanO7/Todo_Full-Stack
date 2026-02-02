@@ -1,7 +1,5 @@
-// lib/auth.ts - Updated auth implementation for Better Auth integration
-
 import { useState, useEffect } from 'react';
-import { jwtDecode } from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode'; // This is already added to package.json
 
 // Define types for our auth system
 interface User {
@@ -13,6 +11,13 @@ interface Session {
   user: User | null;
   isLoading: boolean;
   isError: boolean;
+}
+
+// Types for session management
+export interface AuthToken {
+  token: string;
+  userId: string;
+  expiresAt: number;
 }
 
 // JWT Token interface for decoding
@@ -27,7 +32,7 @@ interface JwtPayload {
 const BETTER_AUTH_BASE_URL = process.env.NEXT_PUBLIC_BETTER_AUTH_URL || 'https://salman907-backend-todo.hf.space';
 
 // Better Auth client implementation
-const authClient = {
+const betterAuthClient = {
   signIn: {
     email: async ({ email, password }: { email: string; password: string }) => {
       // Call Better Auth login endpoint
@@ -194,7 +199,7 @@ const authClient = {
 };
 
 /**
- * Authentication utilities for Better Auth integration
+ * Better Auth utilities for integration with backend
  */
 export const authUtils = {
   /**
@@ -282,7 +287,7 @@ export const authUtils = {
    */
   async logoutUser() {
     try {
-      await authClient.signOut();
+      await betterAuthClient.signOut();
     } catch (error) {
       console.error('Logout error:', error);
       throw error;
@@ -339,7 +344,7 @@ export const authUtils = {
    */
   getCurrentUserId(): string | null {
     try {
-      // First check if we have a valid Better Auth token
+      // First check if we have a valid token
       const token = localStorage.getItem('better-auth.session_token');
       if (token) {
         try {
@@ -362,7 +367,6 @@ export const authUtils = {
         }
       }
 
-      // Fallback to stored user ID
       return localStorage.getItem('current_user_id');
     } catch (error) {
       console.error('Get user ID error:', error);
@@ -372,5 +376,5 @@ export const authUtils = {
 };
 
 // Export the auth hooks and methods
-export const { useSession } = authClient;
-export const { signIn, signOut, signUp } = authClient;
+export const { useSession } = betterAuthClient;
+export const { signIn, signOut, signUp } = betterAuthClient;

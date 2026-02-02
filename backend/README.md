@@ -1,6 +1,6 @@
-# Todo API Backend
+# Todo API Backend - Hugging Face Deployment
 
-This is the backend service for the Todo application, built with FastAPI and PostgreSQL.
+This is the backend service for the Todo application, built with FastAPI and PostgreSQL, optimized for deployment on Hugging Face Spaces.
 
 ## Features
 
@@ -9,6 +9,7 @@ This is the backend service for the Todo application, built with FastAPI and Pos
 - Full CRUD operations for tasks
 - Filtering and sorting capabilities
 - RESTful API design
+- Optimized for Hugging Face Spaces deployment
 
 ## Tech Stack
 
@@ -18,7 +19,38 @@ This is the backend service for the Todo application, built with FastAPI and Pos
 - python-jose - JWT token handling
 - uvicorn - ASGI server
 
-## Setup
+## Hugging Face Spaces Deployment
+
+### Using Docker
+
+1. Make sure your `Dockerfile` is properly configured (included in this repo)
+2. Add your environment variables in the Hugging Face Spaces settings
+3. The application will run on port 8000 by default
+
+### Environment Variables for Production
+
+For Hugging Face deployment, set these environment variables in the Space settings:
+
+```env
+ENVIRONMENT=production
+BETTER_AUTH_SECRET=your_better_auth_secret_here
+DATABASE_URL=postgresql://username:password@host:port/database_name
+CUSTOM_FRONTEND_URL=https://full-stack-todo-app-psi-sand.vercel.app
+```
+
+### Configuration for Better Auth Integration
+
+For proper Better Auth integration with your frontend at `https://full-stack-todo-app-psi-sand.vercel.app`:
+
+1. In your frontend (Vercel deployment), set these environment variables:
+   ```env
+   NEXT_PUBLIC_API_BASE_URL=https://your-hf-space-name.hf.space
+   NEXT_PUBLIC_BETTER_AUTH_URL=https://your-hf-space-name.hf.space
+   ```
+
+2. The backend automatically configures CORS to allow your frontend URL when `CUSTOM_FRONTEND_URL` is set
+
+## Local Development Setup
 
 1. Install Python dependencies:
    ```bash
@@ -63,7 +95,12 @@ All endpoints follow the pattern: `/api/{user_id}/{endpoint}`
 - JWT token verification on all endpoints
 - User ID validation to ensure data isolation
 - Proper error handling with appropriate HTTP status codes
+- Production-ready CORS configuration for your deployed frontend
+
+## Health Check
+
+Use the `/health` endpoint to verify the application status in production.
 
 ## Integration
 
-This backend is designed to work with the frontend at http://localhost:3000 and integrates with Better Auth for user management.
+This backend is designed to work with the frontend deployed at https://full-stack-todo-app-psi-sand.vercel.app and integrates with Better Auth for user management.

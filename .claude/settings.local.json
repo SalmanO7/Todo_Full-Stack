@@ -160,7 +160,10 @@
       "Bash(cmd /c \"dir \"\"C:\\\\Users\\\\HZTech\\\\desktop\\\\Todo-App\\\\backend\\\\*.py\"\"\")",
       "Bash(dir \"C:\\\\Users\\\\HZTech\\\\desktop\\\\Todo-App\\\\backend\" /s)",
       "Bash(powershell Get-Content \"C:\\\\Users\\\\HZTech\\\\desktop\\\\Todo-App\\\\frontend\\\\app\\\\tasks\\\\TasksPageContent.tsx\")",
-      "Bash(Measure-Object -Line)"
+      "Bash(Measure-Object -Line)",
+      "Skill(sp.analyze)",
+      "Bash(powershell -Command \".specify/scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks\")",
+      "Bash(dir /s)"
     ]
   }
 }

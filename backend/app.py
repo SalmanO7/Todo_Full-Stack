@@ -1,7 +1,12 @@
+"""
+Application entry point for Hugging Face Spaces deployment.
+This file serves as the main entry point for the FastAPI application when deployed on Hugging Face Spaces.
+"""
+
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routes import tasks
-import os
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -14,7 +19,7 @@ def get_allowed_origins():
         # For production deployment, allow the deployed frontend URL
         origins = [
             "https://full-stack-todo-app-psi-sand.vercel.app",  # Deployed frontend
-            "https://huggingface.co",  # Hugging Face main domain (if deployed there)
+            "https://huggingface.co",  # Hugging Face main domain
             "https://*.hf.space",      # Hugging Face Spaces subdomains
         ]
 
@@ -88,7 +93,11 @@ init_database()
 def health_check():
     return {"status": "healthy", "environment": os.getenv("ENVIRONMENT", "development")}
 
+
+# This is important for Hugging Face Spaces
+# The app instance should be named 'app' for Hugging Face to pick it up
+# When running on Hugging Face Spaces, it will automatically use the 'app' object
 if __name__ == "__main__":
     import uvicorn
     port = int(os.getenv("PORT", 8000))  # Hugging Face uses PORT environment variable
-    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=(os.getenv("ENVIRONMENT") == "development"))
+    uvicorn.run("app:app", host="0.0.0.0", port=port, reload=(os.getenv("ENVIRONMENT") == "development"))

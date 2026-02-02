@@ -1,6 +1,6 @@
-# Todo App Frontend
+# Todo App Frontend - Production Deployment
 
-A beautiful, responsive, and user-friendly task management application built with Next.js, TypeScript, and Tailwind CSS.
+A beautiful, responsive, and user-friendly task management application built with Next.js, TypeScript, and Tailwind CSS, configured to work with your deployed backend.
 
 ## Features
 
@@ -22,7 +22,32 @@ A beautiful, responsive, and user-friendly task management application built wit
 - **Icons**: Lucide React
 - **Notifications**: Sonner
 
-## Getting Started
+## Production Configuration
+
+### Deployed URLs
+- **Frontend**: https://full-stack-todo-app-psi-sand.vercel.app
+- **Backend**: https://salman907-backend-todo.hf.space
+
+### Environment Variables for Production
+
+Update your `.env.local` file with the production URLs:
+
+```env
+NEXT_PUBLIC_API_BASE_URL=https://salman907-backend-todo.hf.space
+NEXT_PUBLIC_BETTER_AUTH_URL=https://salman907-backend-todo.hf.space
+```
+
+### Configuration Steps
+
+1. Update your `.env.local` file:
+```bash
+NEXT_PUBLIC_API_BASE_URL=https://salman907-backend-todo.hf.space
+NEXT_PUBLIC_BETTER_AUTH_URL=https://salman907-backend-todo.hf.space
+```
+
+2. The application is now configured to communicate with your deployed backend at `https://salman907-backend-todo.hf.space`
+
+## Development Configuration
 
 ### Prerequisites
 
@@ -42,20 +67,22 @@ cd frontend
 npm install
 ```
 
-3. Create a `.env.local` file in the frontend directory and add your environment variables:
+3. Create a `.env.local` file in the frontend directory:
 ```bash
 cp .env.example .env.local
 ```
 
-4. Update the `.env.local` file with your actual configuration:
+4. For local development, use the default configuration:
 ```env
 NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
 NEXT_PUBLIC_BETTER_AUTH_URL=http://localhost:8000
-BETTER_AUTH_URL=http://localhost:8000
-BETTER_AUTH_SECRET=your-super-secret-jwt-key-here-make-sure-it-is-at-least-32-characters-long
 ```
 
-> **Important**: Generate a strong secret key for `BETTER_AUTH_SECRET`. You can use an online generator or run `openssl rand -base64 32` in your terminal.
+For production deployment, update with your deployed URLs:
+```env
+NEXT_PUBLIC_API_BASE_URL=https://salman907-backend-todo.hf.space
+NEXT_PUBLIC_BETTER_AUTH_URL=https://salman907-backend-todo.hf.space
+```
 
 ### Running the Application
 
@@ -66,22 +93,23 @@ npm run dev
 
 2. Open [http://localhost:3000](http://localhost:3000) in your browser to view the application.
 
-### Backend Requirements
+## API Integration
 
-This frontend expects a backend API running on `http://localhost:8000` with the following endpoints:
+This frontend communicates with the backend API at your deployed URL with the following endpoints:
 
 - `GET /api/{user_id}/tasks` - Get user's tasks
 - `POST /api/{user_id}/tasks` - Create a new task
 - `PUT /api/{user_id}/tasks/{task_id}` - Update a task
 - `DELETE /api/{user_id}/tasks/{task_id}` - Delete a task
-- `PATCH /api/{user_id}/tasks/{task_id}/toggle` - Toggle task completion
+- `PATCH /api/{user_id}/tasks/{task_id}/complete` - Toggle task completion status
 
-## Environment Variables
+## Authentication Flow
 
-- `NEXT_PUBLIC_API_BASE_URL` - Base URL for the backend API
-- `NEXT_PUBLIC_BETTER_AUTH_URL` - URL for Better Auth
-- `BETTER_AUTH_URL` - Internal URL for Better Auth
-- `BETTER_AUTH_SECRET` - Secret key for JWT signing (at least 32 characters)
+1. Users sign up or sign in via the authentication pages
+2. Better Auth manages user sessions with JWT tokens
+3. All API requests automatically include the authentication token
+4. Protected routes redirect unauthenticated users to the sign-in page
+5. User isolation is enforced by the backend to ensure users only access their own data
 
 ## Folder Structure
 
@@ -111,12 +139,26 @@ frontend/
 └── public/               # Static assets
 ```
 
-## Authentication Flow
+## Deployment Instructions
 
-1. Users sign up or sign in via the authentication pages
-2. Better Auth manages user sessions with JWT tokens
-3. All API requests automatically include the authentication token
-4. Protected routes redirect unauthenticated users to the sign-in page
+To deploy this frontend to Vercel or similar platform:
+
+1. Make sure your environment variables are set in the deployment platform:
+   - `NEXT_PUBLIC_API_BASE_URL=https://salman907-backend-todo.hf.space`
+   - `NEXT_PUBLIC_BETTER_AUTH_URL=https://salman907-backend-todo.hf.space`
+
+2. Build the application:
+   ```bash
+   npm run build
+   ```
+
+3. The application will be ready for deployment and will connect to your backend at https://salman907-backend-todo.hf.space
+
+## Troubleshooting
+
+- If you get CORS errors, verify that your backend allows requests from your frontend origin
+- If authentication fails, ensure the BETTER_AUTH_SECRET matches between frontend and backend
+- If API calls fail, check that the NEXT_PUBLIC_API_BASE_URL is correctly set to your deployed backend
 
 ## Contributing
 

@@ -65,12 +65,37 @@ class ApiClient {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
-    // For development, we'll send the mock user ID header for all requests
-    // This allows the backend to bypass authentication in development mode
-    const currentUserId = localStorage.getItem('current_user_id') ||
-                          (betterAuthToken ? this.extractUserIdFromToken(betterAuthToken) : null) ||
-                          'dev-user-id';
+    // Extract user ID from the Better Auth token (for production) or fallback to stored ID
+    let currentUserId = 'dev-user-id';
 
+    if (betterAuthToken) {
+      // Extract user ID from Better Auth token
+      try {
+        const tokenParts = betterAuthToken.split('.');
+        if (tokenParts.length === 3) {
+          // Add padding if needed
+          let payload = tokenParts[1];
+          while (payload.length % 4) {
+            payload += '=';
+          }
+
+          const decodedPayload = atob(payload);
+          const payloadObj = JSON.parse(decodedPayload);
+          currentUserId = payloadObj.userId || payloadObj.sub || localStorage.getItem('current_user_id') || 'dev-user-id';
+        }
+      } catch (error) {
+        console.error('Error extracting user ID from Better Auth token:', error);
+        currentUserId = localStorage.getItem('current_user_id') || 'dev-user-id';
+      }
+    } else if (legacyToken) {
+      // Extract user ID from legacy token
+      currentUserId = this.extractUserIdFromToken(legacyToken) || localStorage.getItem('current_user_id') || 'dev-user-id';
+    } else {
+      // Fallback to stored user ID
+      currentUserId = localStorage.getItem('current_user_id') || 'dev-user-id';
+    }
+
+    // Send the user ID in the header (needed for backend user isolation)
     headers['X-Mock-User-ID'] = currentUserId;
 
     try {
