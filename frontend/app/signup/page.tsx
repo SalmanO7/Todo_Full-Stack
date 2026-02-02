@@ -43,8 +43,8 @@ export default function SignUpPage() {
         redirectTo: '/tasks', // Redirect after successful registration
       });
 
-      if (result?.error) {
-        toast.error(result.error.message || 'An error occurred during sign up');
+      if (!result) {
+        toast.error('An error occurred during sign up');
         return;
       }
 

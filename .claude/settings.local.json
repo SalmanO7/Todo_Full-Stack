@@ -168,7 +168,9 @@
       "Bash(dir \"C:\\\\Users\\\\Salman Agwan\\\\desktop\\\\Todo-App\\\\backend\\\\routes\")",
       "Bash(dir \"C:\\\\Users\\\\Salman Agwan\\\\desktop\\\\Todo-App\\\\frontend\\\\app\\\\signup\")",
       "Bash(dir \"C:\\\\Users\\\\Salman Agwan\\\\desktop\\\\Todo-App\\\\frontend\\\\app\\\\signin\")",
-      "Bash(del \"C:\\\\Users\\\\Salman Agwan\\\\desktop\\\\Todo-App\\\\frontend\\\\lib\\\\better-auth-config.ts\")"
+      "Bash(del \"C:\\\\Users\\\\Salman Agwan\\\\desktop\\\\Todo-App\\\\frontend\\\\lib\\\\better-auth-config.ts\")",
+      "Bash(dir frontendlib*.ts)",
+      "Bash(dir \"C:\\\\Users\\\\Salman Agwan\\\\desktop\\\\Todo-App\\\\frontend\\\\lib\" /s)"
     ]
   }
 }

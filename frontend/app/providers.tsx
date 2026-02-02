@@ -5,7 +5,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
 import { useState, useEffect } from 'react';
 import { clearInvalidTokens } from '@/lib/clearInvalidTokens';
-import { ClientProvider } from '@/lib/better-auth-client';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   // Create QueryClient inside the component to avoid server-side creation
@@ -24,13 +23,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <ClientProvider>
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          {children}
-          <Toaster richColors />
-        </ThemeProvider>
-      </QueryClientProvider>
-    </ClientProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        {children}
+        <Toaster richColors />
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 }

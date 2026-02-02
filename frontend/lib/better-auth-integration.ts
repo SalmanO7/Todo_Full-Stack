@@ -377,4 +377,26 @@ export const authUtils = {
 
 // Export the auth hooks and methods
 export const { useSession } = betterAuthClient;
-export const { signIn, signOut, signUp } = betterAuthClient;
+
+// Create the signIn function that matches the expected API
+export async function signIn(provider: string, options: any) {
+  if (provider === 'email') {
+    if (options.isSignUp) {
+      return betterAuthClient.signUp.email({
+        email: options.email,
+        password: options.password,
+        name: options.name
+      });
+    } else {
+      return betterAuthClient.signIn.email({
+        email: options.email,
+        password: options.password
+      });
+    }
+  }
+  return null;
+}
+
+export async function signOut() {
+  return betterAuthClient.signOut();
+}

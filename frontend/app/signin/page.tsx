@@ -27,8 +27,8 @@ export default function SignInPage() {
         redirectTo: '/tasks', // Redirect after successful login
       });
 
-      if (result?.error) {
-        toast.error(result.error.message || 'An error occurred during sign in');
+      if (!result) {
+        toast.error('An error occurred during sign in');
         return;
       }
 
