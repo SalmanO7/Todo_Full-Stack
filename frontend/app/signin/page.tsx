@@ -34,8 +34,11 @@ export default function SignInPage() {
 
       toast.success('Welcome back!');
 
-      // Redirect to tasks immediately after successful login
-      router.push('/tasks');
+      // Wait a moment to ensure token is stored and state is updated
+      setTimeout(() => {
+        // Redirect to tasks immediately after successful login
+        router.push('/tasks');
+      }, 100);
     } catch (error: any) {
       console.error('Sign in error:', error);
       toast.error(error?.message || 'An error occurred during sign in');

@@ -49,8 +49,12 @@ export default function SignUpPage() {
       }
 
       toast.success('Account created successfully! Redirecting to tasks...');
-      // Redirect to tasks immediately after successful registration
-      router.push('/tasks');
+
+      // Wait a moment to ensure token is stored and state is updated
+      setTimeout(() => {
+        // Redirect to tasks immediately after successful registration
+        router.push('/tasks');
+      }, 100);
     } catch (error: any) {
       console.error('Sign up error:', error);
       toast.error(error?.message || 'An error occurred during sign up');
