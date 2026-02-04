@@ -128,6 +128,15 @@ export default function Header() {
                 Sign Out
               </Button>
             </div>
+          ) : session.isLoading ? (
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" disabled>
+                Loading...
+              </Button>
+              <Button variant="default" size="sm" disabled>
+                Loading...
+              </Button>
+            </div>
           ) : (
             <div className="flex items-center gap-2">
               <Link href="/signin">
