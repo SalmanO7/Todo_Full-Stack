@@ -1,6 +1,11 @@
 import { Task, CreateTaskRequest, UpdateTaskRequest } from '@/types';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
+let API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
+
+// Ensure the URL has the correct protocol
+if (API_BASE_URL && !API_BASE_URL.startsWith('http://') && !API_BASE_URL.startsWith('https://')) {
+  API_BASE_URL = 'https://' + API_BASE_URL;
+}
 const AUTH_HEADER = 'Authorization';
 
 export interface ApiResponse<T> {

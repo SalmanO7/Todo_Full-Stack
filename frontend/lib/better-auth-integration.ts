@@ -29,7 +29,12 @@ interface JwtPayload {
 }
 
 // API endpoints - use the same API base URL as the rest of the app
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_BETTER_AUTH_URL || 'http://localhost:8000';
+let API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_BETTER_AUTH_URL || 'http://localhost:8000';
+
+// Ensure the URL has the correct protocol
+if (API_BASE_URL && !API_BASE_URL.startsWith('http://') && !API_BASE_URL.startsWith('https://')) {
+  API_BASE_URL = 'https://' + API_BASE_URL;
+}
 
 // Better Auth client implementation
 const betterAuthClient = {
