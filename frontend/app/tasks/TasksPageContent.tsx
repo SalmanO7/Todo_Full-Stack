@@ -41,12 +41,17 @@ export default function TasksPageContent() {
 
   const { data: tasks, isLoading, isError, refetch } = useTasks(userId || '', statusFilter, sortFilter);
 
-  if (!userId) {
+  if (session.isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <p>Setting up your account...</p>
       </div>
     );
+  }
+
+  if (!userId) {
+    // User is not authenticated, redirect will be handled by ProtectedRoute
+    return null;
   }
 
   if (isError) {
