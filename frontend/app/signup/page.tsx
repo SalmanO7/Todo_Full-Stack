@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
-import { signIn } from '@/lib/auth';
+import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
 export default function SignUpPage() {
@@ -16,6 +16,7 @@ export default function SignUpPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { register } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,27 +35,13 @@ export default function SignUpPage() {
     setIsLoading(true);
 
     try {
-      // Using Better Auth signIn with isSignUp flag to handle registration
-      const result = await signIn('email', {
-        email,
-        password,
-        name, // Include name for registration
-        isSignUp: true, // This tells Better Auth this is a sign-up request
-        redirectTo: '/tasks', // Redirect after successful registration
-      });
-
-      if (!result) {
-        toast.error('An error occurred during sign up');
-        return;
-      }
+      // Register the user
+      await register(name, email, password);
 
       toast.success('Account created successfully! Redirecting to tasks...');
 
-      // Wait a moment to ensure token is stored and state is updated
-      setTimeout(() => {
-        // Redirect to tasks immediately after successful registration
-        router.push('/tasks');
-      }, 200);
+      // Redirect to tasks immediately after successful registration
+      router.push('/tasks');
     } catch (error: any) {
       console.error('Sign up error:', error);
       toast.error(error?.message || 'An error occurred during sign up');

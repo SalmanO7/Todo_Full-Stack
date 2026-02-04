@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
-import { signIn } from '@/lib/auth';
+import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
 export default function SignInPage() {
@@ -14,31 +14,20 @@ export default function SignInPage() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      // Using Better Auth signIn to handle login
-      const result = await signIn('email', {
-        email,
-        password,
-        redirectTo: '/tasks', // Redirect after successful login
-      });
-
-      if (!result) {
-        toast.error('An error occurred during sign in');
-        return;
-      }
+      // Login the user
+      await login(email, password);
 
       toast.success('Welcome back!');
 
-      // Wait a moment to ensure token is stored and state is updated
-      setTimeout(() => {
-        // Redirect to tasks immediately after successful login
-        router.push('/tasks');
-      }, 200);
+      // Redirect to tasks immediately after successful login
+      router.push('/tasks');
     } catch (error: any) {
       console.error('Sign in error:', error);
       toast.error(error?.message || 'An error occurred during sign in');

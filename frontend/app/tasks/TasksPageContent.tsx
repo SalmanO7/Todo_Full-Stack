@@ -9,7 +9,6 @@ import { EmptyState } from '@/components/EmptyState';
 import { TaskModal } from '@/components/TaskModal';
 import { useTasks } from '@/lib/queries';
 import { authUtils, useSession } from '@/lib/auth';
-import ProtectedRoute from '@/components/ProtectedRoute';
 
 export default function TasksPageContent() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -106,52 +105,50 @@ export default function TasksPageContent() {
   };
 
   return (
-    <ProtectedRoute>
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold tracking-tight">My Tasks</h1>
-          <Button onClick={handleCreateTask}>
-            <PlusCircleIcon className="mr-2 h-4 w-4" />
-            Add Task
-          </Button>
-        </div>
-
-        {tasks && tasks.length > 0 ? (
-          <TaskList
-            tasks={tasks}
-            onEdit={handleEditTask}
-            refetchTasks={refetch}
-            initialStatusFilter={statusFilter}
-            initialSortFilter={sortFilter}
-            onFilterChange={updateFilters}
-            isLoading={isLoading}
-          />
-        ) : isLoading ? (
-          <TaskList
-            tasks={[]}
-            onEdit={handleEditTask}
-            refetchTasks={refetch}
-            initialStatusFilter={statusFilter}
-            initialSortFilter={sortFilter}
-            onFilterChange={updateFilters}
-            isLoading={true}
-          />
-        ) : (
-          <EmptyState onCreateTask={handleCreateTask} />
-        )}
-
-        {isModalOpen && (
-          <TaskModal
-            isOpen={isModalOpen}
-            onClose={() => {
-              setIsModalOpen(false);
-              setCurrentTask(null);
-            }}
-            task={currentTask}
-            userId={userId}
-          />
-        )}
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold tracking-tight">My Tasks</h1>
+        <Button onClick={handleCreateTask}>
+          <PlusCircleIcon className="mr-2 h-4 w-4" />
+          Add Task
+        </Button>
       </div>
-    </ProtectedRoute>
+
+      {tasks && tasks.length > 0 ? (
+        <TaskList
+          tasks={tasks}
+          onEdit={handleEditTask}
+          refetchTasks={refetch}
+          initialStatusFilter={statusFilter}
+          initialSortFilter={sortFilter}
+          onFilterChange={updateFilters}
+          isLoading={isLoading}
+        />
+      ) : isLoading ? (
+        <TaskList
+          tasks={[]}
+          onEdit={handleEditTask}
+          refetchTasks={refetch}
+          initialStatusFilter={statusFilter}
+          initialSortFilter={sortFilter}
+          onFilterChange={updateFilters}
+          isLoading={true}
+        />
+      ) : (
+        <EmptyState onCreateTask={handleCreateTask} />
+      )}
+
+      {isModalOpen && (
+        <TaskModal
+          isOpen={isModalOpen}
+          onClose={() => {
+            setIsModalOpen(false);
+            setCurrentTask(null);
+          }}
+          task={currentTask}
+          userId={userId}
+        />
+      )}
+    </div>
   );
 }

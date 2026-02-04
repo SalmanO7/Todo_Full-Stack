@@ -28,15 +28,15 @@ interface JwtPayload {
   iat?: number; // issued at time
 }
 
-// Better Auth API endpoints - use the same API base URL as the rest of the app
-const BETTER_AUTH_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_BETTER_AUTH_URL || 'http://localhost:8000';
+// API endpoints - use the same API base URL as the rest of the app
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_BETTER_AUTH_URL || 'http://localhost:8000';
 
 // Better Auth client implementation
 const betterAuthClient = {
   signIn: {
     email: async ({ email, password }: { email: string; password: string }) => {
       // Call Better Auth login endpoint
-      const response = await fetch(`${BETTER_AUTH_BASE_URL}/api/auth/sign-in/email`, {
+      const response = await fetch(`${API_BASE_URL}/api/auth/sign-in/email`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -71,7 +71,7 @@ const betterAuthClient = {
   signUp: {
     email: async ({ email, password, name }: { email: string; password: string; name: string }) => {
       // Call Better Auth register endpoint
-      const response = await fetch(`${BETTER_AUTH_BASE_URL}/api/auth/sign-up/email`, {
+      const response = await fetch(`${API_BASE_URL}/api/auth/sign-up/email`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -108,7 +108,7 @@ const betterAuthClient = {
     const token = localStorage.getItem('better-auth.session_token');
 
     if (token) {
-      await fetch(`${BETTER_AUTH_BASE_URL}/api/auth/sign-out`, {
+      await fetch(`${API_BASE_URL}/api/auth/sign-out`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -227,7 +227,7 @@ export const authUtils = {
    */
   async loginUser(email: string, password: string) {
     try {
-      const response = await fetch(`${BETTER_AUTH_BASE_URL}/api/auth/sign-in/email`, {
+      const response = await fetch(`${API_BASE_URL}/api/auth/sign-in/email`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -267,7 +267,7 @@ export const authUtils = {
    */
   async registerUser(name: string, email: string, password: string) {
     try {
-      const response = await fetch(`${BETTER_AUTH_BASE_URL}/api/auth/sign-up/email`, {
+      const response = await fetch(`${API_BASE_URL}/api/auth/sign-up/email`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
