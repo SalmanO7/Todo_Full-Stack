@@ -39,8 +39,10 @@ export default function TasksPageContent() {
   const statusFilter = statusParam || 'all';
   const sortFilter = sortParam || 'created';
 
-  const { data: tasks, isLoading, isError, refetch } = useTasks(userId || '', statusFilter, sortFilter);
+  // Only make API calls if userId is available
+  const { data: tasks, isLoading, isError, refetch } = useTasks(userId ? userId : '', statusFilter, sortFilter);
 
+  // Show loading state while session is loading
   if (session.isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -49,9 +51,13 @@ export default function TasksPageContent() {
     );
   }
 
+  // Don't show error for missing userId since ProtectedRoute handles auth
   if (!userId) {
-    // User is not authenticated, redirect will be handled by ProtectedRoute
-    return null;
+    return (
+      <div className="flex items-center justify-center h-64">
+        <p>Setting up your account...</p>
+      </div>
+    );
   }
 
   if (isError) {

@@ -13,25 +13,34 @@ security = HTTPBearer(auto_error=False)
 def get_current_user(request: Request, credentials: HTTPAuthorizationCredentials = Depends(security)) -> Dict:
     """
     Verify JWT token and extract user information
-    Always allow mock user ID from header in development mode
+    Allow mock user ID from header in development mode only
     """
     BETTER_AUTH_SECRET = os.getenv("BETTER_AUTH_SECRET", "G8P173a4T0HV3dBfnNBbyFg1uvcmeWQF")
 
-    # Always check for mock user ID header first for development
+    # Check environment mode
+    environment = os.getenv("ENVIRONMENT", "development")
+
+    # Check for mock user ID header - only allow in development
     mock_user_id = request.headers.get("X-Mock-User-ID")
-    if mock_user_id:
+    if mock_user_id and environment != "production":
         return {
             "user_id": mock_user_id,
             "email": f"{mock_user_id}@gmail.com"
-            
         }
 
     # If no credentials provided, default to dev user (development mode)
     if not credentials or not credentials.credentials:
-        return {
-            "user_id": "dev-user-id",
-            "email": "dev@example.com"
-        }
+        if environment != "production":
+            return {
+                "user_id": "dev-user-id",
+                "email": "dev@example.com"
+            }
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="No credentials provided",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
 
     # Otherwise, validate the JWT token (production mode)
     token = credentials.credentials
@@ -69,11 +78,11 @@ def verify_user_ownership(user_id: str, current_user: Dict = Depends(get_current
     Verify that the requested user ID matches the authenticated user's ID
     Allow all access in development mode
     """
-    # Check if we're in development mode
-    is_development = os.getenv("ENVIRONMENT", "development") != "production"
+    # Check environment mode
+    environment = os.getenv("ENVIRONMENT", "development")
 
     # In development mode, allow access (skip user isolation)
-    if is_development:
+    if environment != "production":
         return
 
     # In production, enforce strict user ownership

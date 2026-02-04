@@ -181,7 +181,10 @@
       "Bash(cmd /c del \"C:\\\\Users\\\\Salman Agwan\\\\desktop\\\\Todo-App\\\\backend\\\\todo_app.db\")",
       "Bash(pip install -r requirements.txt)",
       "Bash(python -c \"\nimport sqlite3\nconn = sqlite3.connect\\(''backend/todo_app.db''\\)\ncursor = conn.cursor\\(\\)\ncursor.execute\\(''SELECT id, email, name FROM users WHERE email = ?'', \\(''test@example.com'',\\)\\)\nresult = cursor.fetchone\\(\\)\nprint\\(''User in database:'', result\\)\nconn.close\\(\\)\n\")",
-      "Bash(python add_missing_columns.py)"
+      "Bash(python add_missing_columns.py)",
+      "Bash(dir \"C:\\\\Users\\\\Salman Agwan\\\\desktop\\\\Todo-App\\\\frontend\" /s)",
+      "Bash(dir \"C:\\\\Users\\\\Salman Agwan\\\\desktop\\\\Todo-App\\\\frontend\" /b)",
+      "Bash(dir \"C:\\\\Users\\\\Salman Agwan\\\\desktop\\\\Todo-App\\\\frontend\")"
     ]
   }
 }

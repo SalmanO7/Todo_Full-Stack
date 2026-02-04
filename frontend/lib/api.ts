@@ -61,7 +61,7 @@ class ApiClient {
     }
 
     // Extract user ID from the Better Auth token for backend user isolation
-    let currentUserId = 'dev-user-id';
+    let currentUserId = null;
 
     if (betterAuthToken) {
       // Extract user ID from Better Auth token
@@ -76,20 +76,23 @@ class ApiClient {
 
           const decodedPayload = atob(payload);
           const payloadObj = JSON.parse(decodedPayload);
-          currentUserId = payloadObj.userId || payloadObj.sub || payloadObj.user_id || 'dev-user-id';
+          currentUserId = payloadObj.userId || payloadObj.sub || payloadObj.user_id;
         }
       } catch (error) {
         console.error('Error extracting user ID from Better Auth token:', error);
         // If we can't extract from token, try to get from localStorage
-        currentUserId = localStorage.getItem('current_user_id') || 'dev-user-id';
+        currentUserId = localStorage.getItem('current_user_id');
       }
     } else {
       // Fallback to stored user ID if no token is available
-      currentUserId = localStorage.getItem('current_user_id') || 'dev-user-id';
+      currentUserId = localStorage.getItem('current_user_id');
     }
 
-    // Send the user ID in the header (needed for backend user isolation)
-    headers['X-Mock-User-ID'] = currentUserId;
+    // Only send the user ID in the header if we have a valid user ID (for development)
+    // In production, rely on JWT token validation
+    if (currentUserId && currentUserId !== 'dev-user-id') {
+      headers['X-Mock-User-ID'] = currentUserId;
+    }
 
     try {
       const response = await fetch(url, {
