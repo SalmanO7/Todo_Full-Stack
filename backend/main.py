@@ -65,14 +65,46 @@ def read_root():
 
 # --- DATABASE INITIALIZATION ---
 def init_database():
-    """Initialize database and create tables if not already created"""
+    """Initialize database and create/update tables if not already created"""
     try:
         import importlib.util
-        spec = importlib.util.spec_from_file_location("init_db", "init_db.py")
-        init_db = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(init_db)
-        init_db.create_tables()
+        from sqlmodel import SQLModel
+        from models import User, Task
+        from db import engine
+
+        # Create all tables based on models
+        SQLModel.metadata.create_all(engine)
         print("Database initialized successfully!")
+
+        # For production, also ensure the hashed_password column exists
+        import sqlalchemy as sa
+        from sqlalchemy import text
+
+        with engine.connect() as conn:
+            # Check database dialect
+            dialect = engine.dialect.name
+
+            column_exists = False
+            if dialect == 'postgresql':
+                # PostgreSQL query
+                result = conn.execute(text("""
+                    SELECT column_name
+                    FROM information_schema.columns
+                    WHERE table_name = 'users' AND column_name = 'hashed_password'
+                """))
+                column_exists = result.fetchone() is not None
+            else:
+                # SQLite query
+                result = conn.execute(text("PRAGMA table_info(users)"))
+                columns = [row[1] for row in result.fetchall()]
+                column_exists = 'hashed_password' in columns
+
+            if not column_exists:
+                print("Adding missing hashed_password column to users table...")
+                conn.execute(text("ALTER TABLE users ADD COLUMN hashed_password VARCHAR(255) NOT NULL DEFAULT ''"))
+                conn.commit()
+                print("hashed_password column added successfully!")
+
     except Exception as e:
         print(f"Database initialization failed: {e}")
         # In production environments, we might want to handle this differently
