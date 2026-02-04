@@ -20,10 +20,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     // Update authentication status based on session
-    const authenticated = !session.isLoading && session.user && session.user.user_id;
+    const authenticated = !session.isLoading && !!session.user && !!session.user.user_id;
     setIsAuthenticated(authenticated);
-
-    console.log('AuthProvider - session updated:', session, 'authenticated:', authenticated);
   }, [session]);
 
   const login = async (email: string, password: string) => {
