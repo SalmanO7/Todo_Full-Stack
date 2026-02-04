@@ -12,8 +12,8 @@ import os
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
-# Password hashing
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# Password hashing with fallback scheme
+pwd_context = CryptContext(schemes=["pbkdf2_sha256", "bcrypt"], deprecated="auto")
 
 # JWT token creation
 SECRET_KEY = os.getenv("BETTER_AUTH_SECRET", "G8P173a4T0HV3dBfnNBbyFg1uvcmeWQF")
@@ -41,7 +41,9 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
 def get_password_hash(password: str) -> str:
-    return pwd_context.hash(password)
+    # Truncate password to 72 bytes to comply with bcrypt limits
+    truncated_password = password[:72] if len(password) > 72 else password
+    return pwd_context.hash(truncated_password)
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
@@ -55,6 +57,20 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
 
 @router.post("/sign-up/email", response_model=AuthResponse)
 async def register_user(user_data: UserCreate, session: Session = Depends(get_session)):
+    # Validate password length (bcrypt has 72-byte limit)
+    if len(user_data.password) > 72:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Password must be 72 characters or less"
+        )
+
+    # Validate password strength
+    if len(user_data.password) < 6:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Password must be at least 6 characters long"
+        )
+
     # Check if user already exists
     existing_user = session.exec(select(User).where(User.email == user_data.email)).first()
     if existing_user:

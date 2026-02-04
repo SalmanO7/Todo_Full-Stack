@@ -174,7 +174,13 @@
       "Bash(dir \"C:\\\\Users\\\\Salman Agwan\\\\desktop\\\\Todo-App\\\\backend\" /s)",
       "Bash(dir \"C:\\\\Users\\\\Salman Agwan\\\\desktop\\\\Todo-App\\\\backend\\\\routes\" /s)",
       "Bash(python -m uvicorn main:app --reload)",
-      "Bash(python -m uvicorn main:app --host 0.0.0.0 --port 8000)"
+      "Bash(python -m uvicorn main:app --host 0.0.0.0 --port 8000)",
+      "Bash(python -c \"from models import User; from sqlmodel import select; print\\(''User model can be imported successfully''\\)\")",
+      "Bash(python -c \"from db import init_db; init_db\\(\\); print\\(''Database initialized successfully''\\)\")",
+      "Bash(del \"C:\\\\Users\\\\Salman Agwan\\\\desktop\\\\Todo-App\\\\backend\\\\todo_app.db\")",
+      "Bash(cmd /c del \"C:\\\\Users\\\\Salman Agwan\\\\desktop\\\\Todo-App\\\\backend\\\\todo_app.db\")",
+      "Bash(pip install -r requirements.txt)",
+      "Bash(python -c \"\nimport sqlite3\nconn = sqlite3.connect\\(''backend/todo_app.db''\\)\ncursor = conn.cursor\\(\\)\ncursor.execute\\(''SELECT id, email, name FROM users WHERE email = ?'', \\(''test@example.com'',\\)\\)\nresult = cursor.fetchone\\(\\)\nprint\\(''User in database:'', result\\)\nconn.close\\(\\)\n\")"
     ]
   }
 }
