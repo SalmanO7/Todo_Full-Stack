@@ -155,6 +155,14 @@ const betterAuthClient = {
               if (decoded.exp && decoded.exp < currentTime) {
                 localStorage.removeItem('better-auth.session_token');
                 localStorage.removeItem('current_user_id');
+
+                // Dispatch storage event to notify other components
+                window.dispatchEvent(new StorageEvent('storage', {
+                  key: 'better-auth.session_token',
+                  oldValue: token,
+                  newValue: null,
+                }));
+
                 setSession({ user: null, isLoading: false, isError: false });
                 return;
               }
@@ -174,6 +182,14 @@ const betterAuthClient = {
               // Clear invalid tokens to prevent repeated errors
               localStorage.removeItem('better-auth.session_token');
               localStorage.removeItem('current_user_id');
+
+              // Dispatch storage event to notify other components
+              window.dispatchEvent(new StorageEvent('storage', {
+                key: 'better-auth.session_token',
+                oldValue: token,
+                newValue: null,
+              }));
+
               setSession({ user: null, isLoading: false, isError: false }); // Don't set isError to true to avoid UI issues
             }
           } else {
@@ -188,7 +204,11 @@ const betterAuthClient = {
       checkSession();
 
       // Check session when storage changes
-      const handleStorageChange = () => checkSession();
+      const handleStorageChange = (e: StorageEvent) => {
+        if (e.key === 'better-auth.session_token') {
+          checkSession();
+        }
+      };
       window.addEventListener('storage', handleStorageChange);
 
       return () => window.removeEventListener('storage', handleStorageChange);

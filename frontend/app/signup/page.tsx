@@ -54,7 +54,7 @@ export default function SignUpPage() {
       setTimeout(() => {
         // Redirect to tasks immediately after successful registration
         router.push('/tasks');
-      }, 100);
+      }, 200);
     } catch (error: any) {
       console.error('Sign up error:', error);
       toast.error(error?.message || 'An error occurred during sign up');

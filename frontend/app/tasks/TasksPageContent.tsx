@@ -26,7 +26,7 @@ export default function TasksPageContent() {
     } else if (!session.isLoading) {
       // If session is loaded but no user, try to get from auth utils
       const id = authUtils.getCurrentUserId();
-      if (id && id !== 'dev-user-id') {
+      if (id && id !== 'dev-user-id' && id !== null) {
         setUserId(id);
       }
     }

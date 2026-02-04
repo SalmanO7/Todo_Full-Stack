@@ -35,10 +35,6 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
     return <>{children}</>;
   }
 
-  // If not authenticated, show a brief loading state before redirect happens
-  return (
-    <div className="flex items-center justify-center min-h-screen">
-      <p>Redirecting to sign in...</p>
-    </div>
-  );
+  // If not authenticated, return null while redirect happens in useEffect
+  return null;
 }
