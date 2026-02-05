@@ -10,7 +10,7 @@ load_dotenv()
 
 # Configure allowed origins based on environment
 def get_allowed_origins():
-    environment = os.getenv("ENVIRONMENT", "development")
+    environment = os.getenv("ENVIRONMENT", "production")  # Changed default to production for security
     if environment == "production":
         # For production deployment, allow the deployed frontend URL
         origins = [
@@ -61,7 +61,7 @@ app.include_router(tasks.router, prefix="/api/{user_id}", tags=["tasks"])
 
 @app.get("/")
 def read_root():
-    return {"message": "Todo API is running!", "environment": os.getenv("ENVIRONMENT", "development")}
+    return {"message": "Todo API is running!", "environment": os.getenv("ENVIRONMENT", "production")}
 
 # --- DATABASE INITIALIZATION ---
 def init_database():
@@ -118,9 +118,11 @@ init_database()
 # Health check endpoint
 @app.get("/health")
 def health_check():
-    return {"status": "healthy", "environment": os.getenv("ENVIRONMENT", "development")}
+    return {"status": "healthy", "environment": os.getenv("ENVIRONMENT", "production")}
 
 if __name__ == "__main__":
     import uvicorn
     port = int(os.getenv("PORT", 7860))  # Hugging Face uses PORT environment variable
-    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=(os.getenv("ENVIRONMENT") == "development"))
+    # For Hugging Face Spaces, always use production settings
+    is_dev = os.getenv("ENVIRONMENT", "production") == "development"
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=is_dev)

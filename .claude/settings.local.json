@@ -184,7 +184,10 @@
       "Bash(python add_missing_columns.py)",
       "Bash(dir \"C:\\\\Users\\\\Salman Agwan\\\\desktop\\\\Todo-App\\\\frontend\" /s)",
       "Bash(dir \"C:\\\\Users\\\\Salman Agwan\\\\desktop\\\\Todo-App\\\\frontend\" /b)",
-      "Bash(dir \"C:\\\\Users\\\\Salman Agwan\\\\desktop\\\\Todo-App\\\\frontend\")"
+      "Bash(dir \"C:\\\\Users\\\\Salman Agwan\\\\desktop\\\\Todo-App\\\\frontend\")",
+      "Bash(python -c \"import fastapi; print\\(''FastAPI is installed''\\)\")",
+      "Bash(python init_db.py)",
+      "Bash(python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload)"
     ]
   }
 }

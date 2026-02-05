@@ -26,7 +26,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string) => {
     try {
-      await authUtils.loginUser(email, password);
+      const result = await authUtils.loginUser(email, password);
+
+      // Ensure the token is properly stored and session updates
+      if (result?.session?.access_token) {
+        localStorage.setItem('better-auth.session_token', result.session.access_token);
+
+        // Dispatch storage event to notify other components
+        window.dispatchEvent(new StorageEvent('storage', {
+          key: 'better-auth.session_token',
+          oldValue: null,
+          newValue: result.session.access_token,
+        }));
+      }
+
       // The session hook will automatically update due to localStorage changes
     } catch (error) {
       console.error('Login error:', error);
@@ -36,7 +49,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const register = async (name: string, email: string, password: string) => {
     try {
-      await authUtils.registerUser(name, email, password);
+      const result = await authUtils.registerUser(name, email, password);
+
+      // Ensure the token is properly stored and session updates
+      if (result?.session?.access_token) {
+        localStorage.setItem('better-auth.session_token', result.session.access_token);
+
+        // Dispatch storage event to notify other components
+        window.dispatchEvent(new StorageEvent('storage', {
+          key: 'better-auth.session_token',
+          oldValue: null,
+          newValue: result.session.access_token,
+        }));
+      }
+
       // The session hook will automatically update due to localStorage changes
     } catch (error) {
       console.error('Registration error:', error);

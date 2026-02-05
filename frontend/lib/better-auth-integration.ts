@@ -51,19 +51,26 @@ const betterAuthClient = {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Login failed');
+        throw new Error(errorData.detail || errorData.message || 'Login failed');
       }
 
       const result = await response.json();
 
       // Store the session token from Better Auth
-      if (result.session?.token) {
-        localStorage.setItem('better-auth.session_token', result.session.token);
+      if (result.session?.access_token) {  // Changed from token to access_token
+        localStorage.setItem('better-auth.session_token', result.session.access_token);
 
         // Decode the token to get user info
         try {
-          const decoded: JwtPayload = jwtDecode(result.session.token);
+          const decoded: JwtPayload = jwtDecode(result.session.access_token);
           localStorage.setItem('current_user_id', decoded.sub);
+
+          // Dispatch storage event to notify other components
+          window.dispatchEvent(new StorageEvent('storage', {
+            key: 'better-auth.session_token',
+            oldValue: null,
+            newValue: result.session.access_token,
+          }));
         } catch (error) {
           console.error('Error decoding token:', error);
         }
@@ -86,19 +93,26 @@ const betterAuthClient = {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Registration failed');
+        throw new Error(errorData.detail || errorData.message || 'Registration failed');
       }
 
       const result = await response.json();
 
       // Store the session token from Better Auth
-      if (result.session?.token) {
-        localStorage.setItem('better-auth.session_token', result.session.token);
+      if (result.session?.access_token) {  // Changed from token to access_token
+        localStorage.setItem('better-auth.session_token', result.session.access_token);
 
         // Decode the token to get user info
         try {
-          const decoded: JwtPayload = jwtDecode(result.session.token);
+          const decoded: JwtPayload = jwtDecode(result.session.access_token);
           localStorage.setItem('current_user_id', decoded.sub);
+
+          // Dispatch storage event to notify other components
+          window.dispatchEvent(new StorageEvent('storage', {
+            key: 'better-auth.session_token',
+            oldValue: null,
+            newValue: result.session.access_token,
+          }));
         } catch (error) {
           console.error('Error decoding token:', error);
         }
@@ -242,19 +256,26 @@ export const authUtils = {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Login failed');
+        throw new Error(errorData.detail || errorData.message || 'Login failed');
       }
 
       const result = await response.json();
 
       // Store the session token from Better Auth
-      if (result.session?.token) {
-        localStorage.setItem('better-auth.session_token', result.session.token);
+      if (result.session?.access_token) {  // Changed from token to access_token
+        localStorage.setItem('better-auth.session_token', result.session.access_token);
 
         // Decode the token to get user info
         try {
-          const decoded: JwtPayload = jwtDecode(result.session.token);
+          const decoded: JwtPayload = jwtDecode(result.session.access_token);
           localStorage.setItem('current_user_id', decoded.sub);
+
+          // Dispatch storage event to notify other components
+          window.dispatchEvent(new StorageEvent('storage', {
+            key: 'better-auth.session_token',
+            oldValue: null,
+            newValue: result.session.access_token,
+          }));
         } catch (error) {
           console.error('Error decoding token:', error);
         }
@@ -282,19 +303,26 @@ export const authUtils = {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Registration failed');
+        throw new Error(errorData.detail || errorData.message || 'Registration failed');
       }
 
       const result = await response.json();
 
       // Store the session token from Better Auth
-      if (result.session?.token) {
-        localStorage.setItem('better-auth.session_token', result.session.token);
+      if (result.session?.access_token) {  // Changed from token to access_token
+        localStorage.setItem('better-auth.session_token', result.session.access_token);
 
         // Decode the token to get user info
         try {
-          const decoded: JwtPayload = jwtDecode(result.session.token);
+          const decoded: JwtPayload = jwtDecode(result.session.access_token);
           localStorage.setItem('current_user_id', decoded.sub);
+
+          // Dispatch storage event to notify other components
+          window.dispatchEvent(new StorageEvent('storage', {
+            key: 'better-auth.session_token',
+            oldValue: null,
+            newValue: result.session.access_token,
+          }));
         } catch (error) {
           console.error('Error decoding token:', error);
         }
